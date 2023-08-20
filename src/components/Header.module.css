@@ -8,3 +8,9 @@
 .header img{
     width: 2rem;
 }
+
+.header strong {
+    margin-left: 1rem;
+    font-size: 1.625rem;
+    color: var(--gray-100);
+}
