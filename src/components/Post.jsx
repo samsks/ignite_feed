@@ -5,10 +5,10 @@ export function Post(){
         <article className={styles.post}>
             <header>
                 <div className={styles.author}>
-                    <img className={styles.avatar} src="https://github.com/samsks.png" />
+                    <img className={styles.avatar} src="https://media.licdn.com/dms/image/D4D03AQEvteIXwNqYtA/profile-displayphoto-shrink_400_400/0/1673893454596?e=1698278400&v=beta&t=WBXTxzwjZDbj1UY4WV41yEV7bRCkvbCt7pJPcYLK4xg" />
                     <div className={styles.authorInfo}>
                         <strong>Samuel Vieira</strong>
-                        <span>Web Developer</span>
+                        <span>Fullstack Developer</span>
                     </div>
                 </div>
                 <time title='19 de agosto às 20:45h'  dateTime='2023-08-19 20:45:59'>Publicado há 1h</time>
