@@ -1,111 +1,112 @@
-import { format, formatDistanceToNow } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
-import { useState } from 'react';
+import { format, formatDistanceToNow } from "date-fns";
+import ptBR from "date-fns/locale/pt-BR";
+import { useState } from "react";
 
-import { Avatar } from './Avatar';
-import { Comment } from './Comment';
-import styles from './Post.module.css';
+import { Avatar } from "./Avatar";
+import { Comment } from "./Comment";
+import styles from "./Post.module.css";
 
+export function Post({ author, content, publishedAt }) {
+  const [comments, setComments] = useState(["Post muito bacana, hein?!"]);
+  const [newCommentText, setNewCommentText] = useState("");
 
-export function Post({author, content, publishedAt}){
+  const publishedDateFormatted = format(
+    publishedAt,
+    "dd 'de' LLLL 'às' HH:mm'h'",
+    {
+      locale: ptBR,
+    },
+  );
 
-    const [comments, setComments] = useState(['Post muito bacana, hein?!'])
-    const [newCommentText, setNewCommentText] = useState('')
+  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+    locale: ptBR,
+    addSuffix: true,
+  });
 
-    const publishedDateFormatted = format(
-        publishedAt,
-        "dd 'de' LLLL 'às' HH:mm'h'",
-        {
-            locale: ptBR
-        }
-    )
+  function handleCreateNewComment() {
+    event.preventDefault();
 
-    const publishedDateRelativeToNow = formatDistanceToNow(
-        publishedAt,
-        {
-            locale: ptBR,
-            addSuffix: true
-        }
-    )
+    setComments([...comments, newCommentText]);
 
-    function handleCreateNewComment(){
-        event.preventDefault()
+    setNewCommentText("");
+  }
 
-        setComments([
-            ...comments,
-            newCommentText
-        ])
+  function handleNewCommentChange() {
+    event.target.setCustomValidity("");
+    setNewCommentText(event.target.value);
+  }
 
-        setNewCommentText('')
-    }
+  function handleNewCommentInvalid() {
+    event.target.setCustomValidity("Não deixe o comentário em branco");
+  }
 
-    function handleNewCommentChange(){
-        event.target.setCustomValidity('')
-        setNewCommentText(event.target.value)
-    }
+  function deleteComment(commentToDelete) {
+    const commentsWithoutDeletedOne = comments.filter(
+      (comment) => comment !== commentToDelete,
+    );
 
-    function handleNewCommentInvalid(){
-        event.target.setCustomValidity('Não deixe o comentário em branco')
-    }
+    setComments(commentsWithoutDeletedOne);
+  }
 
-    function deleteComment(commentToDelete){
-        const commentsWithoutDeletedOne = comments.filter(
-            comment => comment !== commentToDelete
-        )
+  const isNewCommentEmpty = newCommentText.length === 0;
 
-        setComments(commentsWithoutDeletedOne)
-    }
+  return (
+    <article className={styles.post}>
+      <header>
+        <div className={styles.author}>
+          <Avatar src={author.avatarUrl} />
+          <div className={styles.authorInfo}>
+            <strong>{author.name}</strong>
+            <span>{author.role}</span>
+          </div>
+        </div>
+        <time
+          title={publishedDateFormatted}
+          dateTime={publishedAt.toISOString()}
+        >
+          {publishedDateRelativeToNow}
+        </time>
+      </header>
 
-    const isNewCommentEmpty = newCommentText.length === 0;
+      <div className={styles.content}>
+        {content.map((line) => {
+          if (line.type === "paragraph")
+            return <p key={line.content}>{line.content}</p>;
+          else if (line.type === "link")
+            return (
+              <p key={line.content}>
+                <a href="#">{line.content}</a>
+              </p>
+            );
+        })}
+      </div>
 
-    return (
-        <article className={styles.post}>
-            <header>
-                <div className={styles.author}>
-                    <Avatar src={author.avatarUrl} />
-                    <div className={styles.authorInfo}>
-                        <strong>{author.name}</strong>
-                        <span>{author.role}</span>
-                    </div>
-                </div>
-                <time title={publishedDateFormatted}  dateTime={publishedAt.toISOString()}>
-                    {publishedDateRelativeToNow}
-                </time>
-            </header>
+      <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
+        <strong>Deixe seu feedback</strong>
+        <textarea
+          name="comment"
+          placeholder="Deixe seu comentário"
+          value={newCommentText}
+          onChange={handleNewCommentChange}
+          onInvalid={handleNewCommentInvalid}
+          required
+        />
+        <footer>
+          <button type="submit" disabled={isNewCommentEmpty}>
+            Publicar
+          </button>
+        </footer>
+      </form>
 
-            <div className={styles.content}>
-                {content.map(line => {
-                    if (line.type === 'paragraph') return <p key={line.content}>{line.content}</p>
-                    else if (line.type === 'link') return <p key={line.content}><a href="#">{line.content}</a></p>
-                })}
-            </div>
-
-            <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
-                <strong>Deixe seu feedback</strong>
-                <textarea 
-                    name='comment'
-                    placeholder="Deixe seu comentário"
-                    value={newCommentText}
-                    onChange={handleNewCommentChange}
-                    onInvalid={handleNewCommentInvalid}
-                    required
-                />
-                <footer>
-                    <button type="submit" disabled={isNewCommentEmpty}>
-                        Publicar
-                    </button>
-                </footer>
-            </form>
-
-            <div className={styles.commentList}>
-            {comments.map(comment => 
-                <Comment 
-                    key={comment} 
-                    content={comment}
-                    onDeleteComment={deleteComment}
-                />
-            )}
-            </div>
-        </article>
-    )
+      <div className={styles.commentList}>
+        {comments.map((comment) => (
+          <Comment
+            key={comment}
+            content={comment}
+            onDeleteComment={deleteComment}
+          />
+        ))}
+      </div>
+    </article>
+  );
 }
