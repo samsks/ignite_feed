@@ -1,12 +1,29 @@
 import { format, formatDistanceToNow } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from "react";
 
 import { Avatar } from "./Avatar";
 import { Comment } from "./Comment";
 import styles from "./Post.module.css";
 
-export function Post({ author, content, publishedAt }) {
+interface Author {
+  name: string;
+  avatarUrl: string;
+  role: string;
+}
+
+interface Content {
+  type: "paragraph" | "link";
+  content: string;
+}
+
+interface PostProps {
+  author: Author;
+  publishedAt: Date;
+  content: Content[];
+}
+
+export function Post({ author, content, publishedAt }: PostProps) {
   const [comments, setComments] = useState(["Post muito bacana, hein?!"]);
   const [newCommentText, setNewCommentText] = useState("");
 
@@ -15,7 +32,7 @@ export function Post({ author, content, publishedAt }) {
     "dd 'de' LLLL 'às' HH:mm'h'",
     {
       locale: ptBR,
-    },
+    }
   );
 
   const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
@@ -23,7 +40,7 @@ export function Post({ author, content, publishedAt }) {
     addSuffix: true,
   });
 
-  function handleCreateNewComment() {
+  function handleCreateNewComment(event: FormEvent) {
     event.preventDefault();
 
     setComments([...comments, newCommentText]);
@@ -31,18 +48,18 @@ export function Post({ author, content, publishedAt }) {
     setNewCommentText("");
   }
 
-  function handleNewCommentChange() {
+  function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity("");
     setNewCommentText(event.target.value);
   }
 
-  function handleNewCommentInvalid() {
+  function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity("Não deixe o comentário em branco");
   }
 
-  function deleteComment(commentToDelete) {
+  function deleteComment(commentToDelete: string) {
     const commentsWithoutDeletedOne = comments.filter(
-      (comment) => comment !== commentToDelete,
+      (comment) => comment !== commentToDelete
     );
 
     setComments(commentsWithoutDeletedOne);
